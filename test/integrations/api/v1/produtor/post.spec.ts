@@ -18,11 +18,13 @@ describe('POST api/v1/produtor', () => {
 
   it('With valid data', async () => {
     const response = await request(app.getHttpServer())
-      .post('/api/v1/produtor')
-      .send({})
+      .post('/api/v1/producer')
+      .send({
+        name: 'Producer Name',
+        cpfCnpj: '31101816066',
+      })
       .expect(201);
-      
-      expect(response.status).toBe(201);
-    });
 
+    expect(response.status).toBe(201);
+  });
 });
