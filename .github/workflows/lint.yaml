@@ -1,0 +1,35 @@
+name: Linting
+
+on: pull_request
+
+jobs:
+  prettier:
+    name: Prettier
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "lts/hydrogen"
+
+      - run: yarn install --frozen-lockfile
+
+      - run: yarn run lint:prettier:check
+  eslint:
+    name: ESLint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "lts/hydrogen"
+
+      - run: yarn install --frozen-lockfile
+
+      - run: yarn run lint:eslint:check
