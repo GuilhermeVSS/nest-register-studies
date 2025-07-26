@@ -1,45 +1,44 @@
-import { Injectable } from "@nestjs/common";
-import { PrismaService } from "../../../../prisma/prisma.service";
-import { ProducerRepository } from "../../domain/repositories/producer.repository";
-import { Producer } from "../../domain/entities/producer.entity";
-import { CpfCnpj } from "../../domain/value-objects/cpf-cnpj.vo";
-import { Name } from "../../domain/value-objects/name.vo";
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../../../../prisma/prisma.service';
+import { ProducerRepository } from '../../domain/repositories/producer.repository';
+import { Producer } from '../../domain/entities/producer.entity';
+import { CpfCnpj } from '../../domain/value-objects/cpf-cnpj.vo';
+import { Name } from '../../domain/value-objects/name.vo';
 
 @Injectable()
 export class ProducerPrismaRepository implements ProducerRepository {
-    constructor(private readonly prismaService: PrismaService) {}
-    async save(producer: Producer): Promise<Producer | Error> {
-        const data = await this.prismaService.producer.create({
-            data: {
-                id: producer.id,
-                name: producer.name.value,
-                cpfCnpj: producer.cpfCnpj.value,
-            },
-        });
+  constructor(private readonly prismaService: PrismaService) {}
+  async save(producer: Producer): Promise<Producer | Error> {
+    const data = await this.prismaService.producer.create({
+      data: {
+        id: producer.id,
+        name: producer.name.value,
+        cpfCnpj: producer.cpfCnpj.value,
+      },
+    });
 
-        return new Producer({
-            id: data.id,
-            name: Name.create(data.name) as Name,
-            cpfCnpj: CpfCnpj.create(data.cpfCnpj) as CpfCnpj,
-        });
+    return new Producer({
+      id: data.id,
+      name: Name.create(data.name) as Name,
+      cpfCnpj: CpfCnpj.create(data.cpfCnpj) as CpfCnpj,
+    });
+  }
 
+  async findByCpfCnpj(cpfCnpj: string): Promise<Producer | null> {
+    const data = await this.prismaService.producer.findUnique({
+      where: {
+        cpfCnpj,
+      },
+    });
+
+    if (!data) {
+      return null;
     }
 
-    async findByCpfCnpj(cpfCnpj: string): Promise<Producer | null> {
-        const data = await this.prismaService.producer.findUnique({
-            where: {
-                cpfCnpj,
-            },
-        });
-
-        if (!data) {
-            return null;
-        }
-
-        return new Producer({
-            id: data.id,
-            name: Name.create(data.name) as Name,
-            cpfCnpj: CpfCnpj.create(data.cpfCnpj) as CpfCnpj,
-        });
-    }
+    return new Producer({
+      id: data.id,
+      name: Name.create(data.name) as Name,
+      cpfCnpj: CpfCnpj.create(data.cpfCnpj) as CpfCnpj,
+    });
+  }
 }

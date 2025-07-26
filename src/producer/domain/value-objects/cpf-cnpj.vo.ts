@@ -1,10 +1,10 @@
-import {cpf, cnpj} from 'cpf-cnpj-validator';
+import { cpf, cnpj } from 'cpf-cnpj-validator';
 
 export class CpfCnpj {
-  private readonly _value :string;
+  private readonly _value: string;
 
   constructor(cpfCnpj: string) {
-      this._value = cpfCnpj;
+    this._value = cpfCnpj;
   }
 
   static isValid(value: string): boolean {
@@ -12,7 +12,7 @@ export class CpfCnpj {
   }
 
   static create(cpfCnpj: string): CpfCnpj | Error {
-    if(this.isValid(cpfCnpj)) {
+    if (this.isValid(cpfCnpj)) {
       return new CpfCnpj(cpfCnpj);
     }
     return new Error('Invalid CPF or CNPJ');
