@@ -16,6 +16,10 @@ describe('POST api/v1/produtor', () => {
     await app.init();
   });
 
+  afterAll(async () => {
+    await app.close();
+  });
+
   it('With valid data', async () => {
     const response = await request(app.getHttpServer())
       .post('/api/v1/producer')
