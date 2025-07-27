@@ -2,6 +2,7 @@ import { FarmRepository } from '../../domain/repositories/farm.repository';
 import { Farm } from '../../domain/entities/farm.entity';
 import { FarmArea } from '../../domain/value-object/farm-area.vo';
 import { BadRequestException, ConflictException } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 
 interface CreateFarmInput {
   name: string;
@@ -28,17 +29,6 @@ export class CreateFarmUseCase {
   constructor(private readonly farmRepository: FarmRepository) {}
 
   async execute(input: CreateFarmInput): Promise<CreateFarmOutput | Error> {
-    const existingFarm = await this.farmRepository.findByNameAndProducerId(
-      input.name,
-      input.producerId,
-    );
-
-    if (existingFarm) {
-      throw new ConflictException(
-        'A farm with this name already exist for this producer.',
-      );
-    }
-
     const farmArea = FarmArea.create({
       totalArea: input.totalArea,
       vegetationArea: input.vegetationArea,
@@ -57,20 +47,42 @@ export class CreateFarmUseCase {
       farmArea,
     });
 
-    const savedFarm = await this.farmRepository.save(farm);
-    if (savedFarm instanceof Error) {
-      throw savedFarm;
-    }
+    try {
+      const savedFarm = await this.farmRepository.save(farm);
+      if (savedFarm instanceof Error) {
+        throw savedFarm;
+      }
 
-    return {
-      id: savedFarm.id!,
-      name: savedFarm.name,
-      city: savedFarm.city,
-      stateId: savedFarm.stateId,
-      producerId: savedFarm.producerId,
-      totalArea: savedFarm.totalArea,
-      vegetationArea: savedFarm.vegetationArea,
-      arableArea: savedFarm.arableArea,
-    };
+      return {
+        id: savedFarm.id!,
+        name: savedFarm.name,
+        city: savedFarm.city,
+        stateId: savedFarm.stateId,
+        producerId: savedFarm.producerId,
+        totalArea: savedFarm.totalArea,
+        vegetationArea: savedFarm.vegetationArea,
+        arableArea: savedFarm.arableArea,
+      };
+    } catch (error) {
+      if (
+        (error instanceof Prisma.PrismaClientKnownRequestError &&
+          error.code === 'P2002') ||
+        (error as { code: string }).code == 'P2002'
+      ) {
+        throw new ConflictException(
+          'A farm with this name already exist for this producer.',
+        );
+      }
+
+      if (
+        (error instanceof Prisma.PrismaClientKnownRequestError &&
+          error.code === 'P2003') ||
+        (error as { code: string }).code == 'P2003'
+      ) {
+        throw new BadRequestException('producerId or stateId invalid.');
+      }
+
+      throw error;
+    }
   }
 }

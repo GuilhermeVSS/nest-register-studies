@@ -44,4 +44,5 @@ model Farm {
 
   @@index([producerId])
   @@index([stateId])
+  @@unique([producerId, name])
 }

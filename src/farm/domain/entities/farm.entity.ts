@@ -59,6 +59,14 @@ export class Farm {
     return this._vegetationArea;
   }
 
+  set name(name: string) {
+    this._name = name;
+  }
+
+  set city(city: string) {
+    this._city = city;
+  }
+
   updateAreas(farmArea: FarmArea): void {
     this._totalArea = farmArea.totalArea;
     this._arableArea = farmArea.arableArea;
