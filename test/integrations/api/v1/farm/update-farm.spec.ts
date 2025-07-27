@@ -175,4 +175,22 @@ describe('PATCH api/v1/farm', () => {
       'A farm with this name already exist for this producer.',
     );
   });
+
+  it('With unexisting farm', async () => {
+    const input = {
+      name: 'To Be Invalid Name',
+      totalArea: 7.5,
+      vegetationArea: 5.5,
+      arableArea: 2.0,
+    };
+
+    const response = await request(app.getHttpServer())
+      .patch(`/api/v1/farm/69b0e571-90b8-4bb7-ad33-0c45fa7c2692`)
+      .send(input)
+      .expect(404);
+    expect(response.status).toBe(404);
+    expect((response.body as { message: string }).message).toBe(
+      'Farm was not found.',
+    );
+  });
 });

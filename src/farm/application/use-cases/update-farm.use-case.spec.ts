@@ -1,7 +1,11 @@
-import { BadRequestException, ConflictException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import { UpdateFarmUseCase } from './update-farm.use-case';
 import { FarmRepository } from '../../domain/repositories/farm.repository';
-import { Farm } from '../..//domain/entities/farm.entity';
+import { Farm } from '../../domain/entities/farm.entity';
 import { FarmArea } from '../../domain/value-object/farm-area.vo';
 import { Prisma } from '@prisma/client';
 
@@ -128,6 +132,21 @@ describe('UpdateFarmUseCase', () => {
       arableArea: 2.0,
     };
 
+    jest.spyOn(farmRepository, 'findById').mockResolvedValue(
+      new Farm({
+        id: 'fbf6ec4d-06f2-4f92-b28f-33e7073f31a8',
+        name: 'Farm Test',
+        city: 'City Test',
+        stateId: 'a697d810-f71d-4e9e-aa4d-60560939caa3',
+        producerId: 'fb9cc64f-a088-4c93-be42-2ec0d826050d',
+        farmArea: FarmArea.create({
+          totalArea: 5.5,
+          vegetationArea: 3.5,
+          arableArea: 2.0,
+        }) as FarmArea,
+      }),
+    );
+
     jest.spyOn(farmRepository, 'update').mockRejectedValue({
       code: 'P2002',
       clientVersion: Prisma.prismaVersion.client,
@@ -141,5 +160,19 @@ describe('UpdateFarmUseCase', () => {
     await expect(
       useCase.execute(input, 'fbf6ec4d-06f2-4f92-b28f-33e7073f31a8'),
     ).rejects.toThrow(ConflictException);
+  });
+
+  it('should throw NotFoundException', async () => {
+    const input = {
+      name: 'Name Already Exists',
+      city: 'City Test Update',
+      totalArea: 7.5,
+      vegetationArea: 5.5,
+      arableArea: 2.0,
+    };
+
+    await expect(
+      useCase.execute(input, 'fbf6ec4d-06f2-4f92-b28f-33e7073f31a8'),
+    ).rejects.toThrow(NotFoundException);
   });
 });

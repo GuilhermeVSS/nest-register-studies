@@ -53,6 +53,10 @@ export class FarmController {
     status: 409,
     description: 'Conflict: A farm already exists.',
   })
+  @ApiResponse({
+    status: 404,
+    description: 'Farm not found',
+  })
   async update(@Param('id') id: IdFarmDto['id'], @Body() dto: UpdateFarmDto) {
     return await this.updateFarmUseCase.execute(dto, id);
   }
