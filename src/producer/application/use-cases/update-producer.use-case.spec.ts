@@ -16,6 +16,7 @@ describe('UpdateProducerUseCase', () => {
       findById: jest.fn(),
       update: jest.fn(),
       delete: jest.fn(),
+      list: jest.fn(),
     } as ProducerRepository;
     useCase = new UpdateProducerUseCase(producerRepository);
   });

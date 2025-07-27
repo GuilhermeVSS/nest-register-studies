@@ -18,6 +18,7 @@ describe('ProducerController', () => {
       findById = jest.fn();
       update = jest.fn();
       delete = jest.fn();
+      list = jest.fn();
     }
     producerRepository = new MockProducerPrismaRepository({} as PrismaService);
     controller = new ProducerController(producerRepository);
@@ -152,6 +153,61 @@ describe('ProducerController', () => {
       await expect(controller.delete(producerId)).rejects.toThrow(
         NotFoundException,
       );
+    });
+  });
+
+  describe('findById', () => {
+    it('should find a producer by id successfully', async () => {
+      const producerId = '1a8f1fcd-8461-4195-9a11-47be00d8dd43';
+      (producerRepository.findById as jest.Mock).mockResolvedValue({
+        id: producerId,
+        name: { value: 'Producer Name' },
+        cpfCnpj: { value: '60899174000' },
+      });
+
+      const result = await controller.findById(producerId);
+      expect(result).toEqual({
+        id: producerId,
+        name: 'Producer Name',
+        cpfCnpj: '60899174000',
+      });
+    });
+
+    it('should throw NotFoundException if producer does not exist', async () => {
+      const producerId = '1a8f1fcd-8461-4195-9a11-47be00d8dd43';
+      (producerRepository.findById as jest.Mock).mockResolvedValue(null);
+
+      await expect(controller.findById(producerId)).rejects.toThrow(
+        NotFoundException,
+      );
+    });
+  });
+
+  describe('findAll', () => {
+    it('should list all producers successfully', async () => {
+      (producerRepository.list as jest.Mock).mockResolvedValue([
+        {
+          id: '1a8f1fcd-8461-4195-9a11-47be00d8dd43',
+          name: { value: 'Producer Name' },
+          cpfCnpj: { value: '60899174000' },
+        },
+      ]);
+
+      const result = await controller.findAll();
+      expect(result).toEqual([
+        {
+          id: '1a8f1fcd-8461-4195-9a11-47be00d8dd43',
+          name: 'Producer Name',
+          cpfCnpj: '60899174000',
+        },
+      ]);
+    });
+
+    it('should return an empty array', async () => {
+      (producerRepository.list as jest.Mock).mockResolvedValue([]);
+
+      const result = await controller.findAll();
+      expect(result).toEqual([]);
     });
   });
 });

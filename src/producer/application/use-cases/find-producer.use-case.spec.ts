@@ -1,12 +1,12 @@
 import { NotFoundException } from '@nestjs/common';
-import { DeleteProducerUseCase } from './delete-producer.use-case';
+import { FindProducerUseCase } from './find-producer.use-case';
 import { ProducerRepository } from '../../domain/repositories/producer.repository';
 import { Producer } from '../../domain/entities/producer.entity';
 import { CpfCnpj } from '../../domain/value-objects/cpf-cnpj.vo';
 import { Name } from '../../domain/value-objects/name.vo';
 
-describe('DeleteProducerUseCase', () => {
-  let useCase: DeleteProducerUseCase;
+describe('FindProducerUseCase', () => {
+  let useCase: FindProducerUseCase;
   let producerRepository: ProducerRepository;
 
   beforeEach(() => {
@@ -18,10 +18,10 @@ describe('DeleteProducerUseCase', () => {
       delete: jest.fn(),
       list: jest.fn(),
     } as ProducerRepository;
-    useCase = new DeleteProducerUseCase(producerRepository);
+    useCase = new FindProducerUseCase(producerRepository);
   });
 
-  it('should delete a producer successfully', async () => {
+  it('should find a producer successfully', async () => {
     const producerId = '1a8f1fcd-8461-4195-9a11-47be00d8dd43';
 
     const existingProducer = new Producer({
@@ -33,13 +33,13 @@ describe('DeleteProducerUseCase', () => {
     jest
       .spyOn(producerRepository, 'findById')
       .mockResolvedValue(existingProducer);
-    jest.spyOn(producerRepository, 'delete').mockResolvedValue(undefined);
 
     const result = await useCase.execute(producerId);
 
     expect(result).toEqual({
-      message: 'Producer deleted successfully',
-      producerId: existingProducer.id,
+      id: existingProducer.id,
+      name: existingProducer.name.value,
+      cpfCnpj: existingProducer.cpfCnpj.value,
     });
   });
 
