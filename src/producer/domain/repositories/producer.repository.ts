@@ -5,4 +5,5 @@ export interface ProducerRepository {
   findByCpfCnpj(cpfCnpj: string): Promise<Producer | null>;
   findById(id: string): Promise<Producer | null>;
   update(producer: Producer): Promise<Producer>;
+  delete(id: string): Promise<void | Error>;
 }

@@ -1,4 +1,4 @@
-import { IsString, Length } from 'class-validator';
+import { IsString, IsUUID, Length } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class UpdateProducerDto {
@@ -9,4 +9,9 @@ export class UpdateProducerDto {
   })
   @Length(3, 100, { message: 'Name must be between 3 and 100 characters long' })
   name: string;
+}
+
+export class UpdateProducerIdDto {
+  @IsUUID('4', { message: 'Invalid producer ID format' })
+  id: string;
 }

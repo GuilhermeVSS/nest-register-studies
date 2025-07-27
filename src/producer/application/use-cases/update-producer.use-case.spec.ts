@@ -15,6 +15,7 @@ describe('UpdateProducerUseCase', () => {
       findByCpfCnpj: jest.fn(),
       findById: jest.fn(),
       update: jest.fn(),
+      delete: jest.fn(),
     } as ProducerRepository;
     useCase = new UpdateProducerUseCase(producerRepository);
   });
