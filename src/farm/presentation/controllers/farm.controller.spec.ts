@@ -1,5 +1,9 @@
 import { FarmController } from './farm.controller';
-import { BadRequestException, ConflictException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import { FarmPrismaRepository } from '../../infrastructure/prisma/farm.prisma.repository';
 import { PrismaService } from 'prisma/prisma.service';
 import { Prisma } from '@prisma/client';
@@ -176,11 +180,9 @@ describe('FarmController', () => {
       );
 
       await expect(
-        controller.create({
+        controller.update('fb9cc64f-a088-4c93-be42-2ec0d826050d', {
           name: 'Farm Test',
           city: 'City Test',
-          stateId: '7457f7e9-8794-4a71-838c-eb688ebc887b',
-          producerId: '80ec73f4-47fe-441b-a5ec-b37779a6fc4a',
           totalArea: 5.5,
           vegetationArea: 7.5,
           arableArea: 2.0,
@@ -223,6 +225,52 @@ describe('FarmController', () => {
           arableArea: 2.0,
         }),
       ).rejects.toThrow(ConflictException);
+    });
+
+    it('should return NotFoundException', async () => {
+      (farmRepository.findById as jest.Mock).mockResolvedValue(null);
+
+      await expect(
+        controller.delete('fb9cc64f-a088-4c93-be42-2ec0d826050d'),
+      ).rejects.toThrow(NotFoundException);
+    });
+  });
+
+  describe('delete', () => {
+    it('should delete a farm successfully', async () => {
+      (farmRepository.findById as jest.Mock).mockResolvedValue(
+        new Farm({
+          id: 'fb9cc64f-a088-4c93-be42-2ec0d826050d',
+          name: 'Farm Test',
+          city: 'City Test',
+          stateId: '7457f7e9-8794-4a71-838c-eb688ebc887b',
+          producerId: '80ec73f4-47fe-441b-a5ec-b37779a6fc4a',
+          farmArea: FarmArea.create({
+            totalArea: 5.5,
+            vegetationArea: 3.5,
+            arableArea: 2.0,
+          }) as FarmArea,
+        }),
+      );
+
+      (farmRepository.delete as jest.Mock).mockResolvedValue(null);
+
+      const result = await controller.delete(
+        'fb9cc64f-a088-4c93-be42-2ec0d826050d',
+      );
+
+      expect(result).toEqual({
+        farmId: 'fb9cc64f-a088-4c93-be42-2ec0d826050d',
+        message: 'Farm deleted successfully',
+      });
+    });
+
+    it('should return NotFoundException', async () => {
+      (farmRepository.findById as jest.Mock).mockResolvedValue(null);
+
+      await expect(
+        controller.delete('fb9cc64f-a088-4c93-be42-2ec0d826050d'),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 });

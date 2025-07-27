@@ -6,6 +6,7 @@ import {
   HttpStatus,
   Param,
   Patch,
+  Delete,
 } from '@nestjs/common';
 import { CreateFarmDto } from '../../application/dto/create-farm.dto';
 import { CreateFarmUseCase } from '../../application/use-cases/create-farm.use-case';
@@ -14,15 +15,19 @@ import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UpdateFarmUseCase } from '../../application/use-cases/update-farm.use-case';
 import { IdFarmDto } from '../..//application/dto/id-farm.dto';
 import { UpdateFarmDto } from '../../application/dto/update-form.dto';
+import { DeleteFarmUseCase } from '../../application/use-cases/delete-farm.use-case';
 
 @ApiTags('Farms')
 @Controller('api/v1/farm')
 export class FarmController {
   private readonly createFarmUseCase: CreateFarmUseCase;
   private readonly updateFarmUseCase: UpdateFarmUseCase;
+  private readonly deleteFarmUseCase: DeleteFarmUseCase;
+
   constructor(private readonly farmRepository: FarmPrismaRepository) {
     this.createFarmUseCase = new CreateFarmUseCase(this.farmRepository);
     this.updateFarmUseCase = new UpdateFarmUseCase(this.farmRepository);
+    this.deleteFarmUseCase = new DeleteFarmUseCase(this.farmRepository);
   }
 
   @Post()
@@ -59,5 +64,20 @@ export class FarmController {
   })
   async update(@Param('id') id: IdFarmDto['id'], @Body() dto: UpdateFarmDto) {
     return await this.updateFarmUseCase.execute(dto, id);
+  }
+
+  @Delete(':id')
+  @HttpCode(HttpStatus.OK)
+  @ApiResponse({
+    status: 200,
+    description: 'The record has been successfully deleted',
+  })
+  @ApiResponse({ status: 500, description: 'Internal Server Error.' })
+  @ApiResponse({
+    status: 404,
+    description: 'Farm not found',
+  })
+  async delete(@Param('id') id: IdFarmDto['id']) {
+    return await this.deleteFarmUseCase.execute(id);
   }
 }
