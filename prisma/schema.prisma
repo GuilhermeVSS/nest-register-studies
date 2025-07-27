@@ -8,9 +8,41 @@ datasource db {
 }
 
 model Producer {
-  id      String @id @default(uuid())
+  id      String  @id @default(uuid())
   name    String
-  cpfCnpj String @unique
+  cpfCnpj String  @unique
+  farms   Farm[]
 
   @@index([cpfCnpj])
+}
+
+model State {
+  id    String  @id @default(uuid())
+  name  String
+  uf String  @unique
+  farms Farm[]
+
+  @@index([uf])
+}
+
+model Farm {
+  id             String   @id @default(uuid())
+  name           String
+  city           String
+  totalArea      Float
+  arableArea     Float
+  vegetationArea Float
+
+  producerId     String
+  producer       Producer @relation(fields: [producerId], references: [id], onDelete: Cascade)
+
+  stateId        String
+  state          State    @relation(fields: [stateId], references: [id])
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([producerId])
+  @@index([stateId])
+  @@unique([producerId, name])
 }
