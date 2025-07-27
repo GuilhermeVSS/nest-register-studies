@@ -13,6 +13,8 @@ describe('CreateProducerUseCase', () => {
     producerRepository = {
       save: jest.fn(),
       findByCpfCnpj: jest.fn(),
+      findById: jest.fn(),
+      update: jest.fn(),
     } as ProducerRepository;
     useCase = new CreateProducerUseCase(producerRepository);
   });

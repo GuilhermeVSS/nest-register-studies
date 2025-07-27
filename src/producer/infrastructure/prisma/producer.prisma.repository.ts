@@ -41,4 +41,34 @@ export class ProducerPrismaRepository implements ProducerRepository {
       cpfCnpj: CpfCnpj.create(data.cpfCnpj) as CpfCnpj,
     });
   }
+
+  async findById(id: string): Promise<Producer | null> {
+    const data = await this.prismaService.producer.findUnique({
+      where: { id },
+    });
+
+    if (!data) return null;
+
+    return new Producer({
+      id: data.id,
+      name: Name.create(data.name) as Name,
+      cpfCnpj: CpfCnpj.create(data.cpfCnpj) as CpfCnpj,
+    });
+  }
+
+  async update(producer: Producer): Promise<Producer> {
+    const data = await this.prismaService.producer.update({
+      where: { id: producer.id },
+      data: {
+        name: producer.name.value,
+        cpfCnpj: producer.cpfCnpj.value,
+      },
+    });
+
+    return new Producer({
+      id: data.id,
+      name: Name.create(data.name) as Name,
+      cpfCnpj: CpfCnpj.create(data.cpfCnpj) as CpfCnpj,
+    });
+  }
 }
