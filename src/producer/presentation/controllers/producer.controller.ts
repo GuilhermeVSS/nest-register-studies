@@ -7,18 +7,18 @@ import {
   Patch,
   Param,
   Delete,
+  Get,
 } from '@nestjs/common';
 import { CreateProducerDto } from '../../application/dto/create-producer.dto';
 import { CreateProducerUseCase } from '../../application/use-cases/create-producer.use-case';
 import { UpdateProducerUseCase } from '../../application/use-cases/update-producer.use-case';
 import { DeleteProducerUseCase } from '../../application/use-cases/delete-producer.use-case';
+import { FindProducerUseCase } from '../../application/use-cases/find-producer.use-case';
+import { ListProducerUseCase } from '../../application/use-cases/list-producer.use-case';
 import { ProducerPrismaRepository } from '../../infrastructure/prisma/producer.prisma.repository';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
-import {
-  UpdateProducerDto,
-  UpdateProducerIdDto,
-} from '../../application/dto/update-producer.dto';
-import { DeleteProducerDto } from 'src/producer/application/dto/delete-producer.dto';
+import { UpdateProducerDto } from '../../application/dto/update-producer.dto';
+import { IdProducerDto } from 'src/producer/application/dto/id-producer.dto';
 
 @ApiTags('Producers')
 @Controller('api/v1/producer')
@@ -26,6 +26,8 @@ export class ProducerController {
   private readonly createProducerUseCase: CreateProducerUseCase;
   private readonly updateProducerUseCase: UpdateProducerUseCase;
   private readonly deleteProducerUseCase: DeleteProducerUseCase;
+  private readonly findProducerByIdUseCase: FindProducerUseCase;
+  private readonly listProducerUseCase: ListProducerUseCase;
 
   constructor(private readonly producerRepository: ProducerPrismaRepository) {
     this.createProducerUseCase = new CreateProducerUseCase(
@@ -37,6 +39,10 @@ export class ProducerController {
     this.deleteProducerUseCase = new DeleteProducerUseCase(
       this.producerRepository,
     );
+    this.findProducerByIdUseCase = new FindProducerUseCase(
+      this.producerRepository,
+    );
+    this.listProducerUseCase = new ListProducerUseCase(this.producerRepository);
   }
 
   @Post()
@@ -68,7 +74,7 @@ export class ProducerController {
   })
   @ApiResponse({ status: 500, description: 'Internal Server Error.' })
   async update(
-    @Param('id') id: UpdateProducerIdDto['id'],
+    @Param('id') id: IdProducerDto['id'],
     @Body() dto: UpdateProducerDto,
   ) {
     const producer = await this.updateProducerUseCase.execute(dto, id);
@@ -86,7 +92,37 @@ export class ProducerController {
     description: 'Not Found: Producer does not exist.',
   })
   @ApiResponse({ status: 500, description: 'Internal Server Error.' })
-  async delete(@Param('id') id: DeleteProducerDto['id']) {
+  async delete(@Param('id') id: IdProducerDto['id']) {
     return await this.deleteProducerUseCase.execute(id);
+  }
+
+  @Get(':id')
+  @HttpCode(HttpStatus.OK)
+  @ApiResponse({
+    status: 200,
+    description: 'Producer found successfully.',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Not Found: Producer does not exist.',
+  })
+  @ApiResponse({ status: 500, description: 'Internal Server Error.' })
+  async findById(@Param('id') id: IdProducerDto['id']) {
+    return await this.findProducerByIdUseCase.execute(id);
+  }
+
+  @Get()
+  @HttpCode(HttpStatus.OK)
+  @ApiResponse({
+    status: 200,
+    description: 'Producers found successfully.',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Not Found: Producer does not exist.',
+  })
+  @ApiResponse({ status: 500, description: 'Internal Server Error.' })
+  async findAll() {
+    return await this.listProducerUseCase.execute();
   }
 }

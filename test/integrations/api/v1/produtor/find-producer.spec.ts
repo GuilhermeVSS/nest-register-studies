@@ -5,7 +5,7 @@ import * as request from 'supertest';
 import { App } from 'supertest/types';
 import { AppModule } from '../../../../../src/app.module';
 
-describe('PATCH api/v1/produtor/:id', () => {
+describe('GET api/v1/produtor/:id', () => {
   let app: INestApplication<App>;
 
   beforeEach(async () => {
@@ -27,44 +27,28 @@ describe('PATCH api/v1/produtor/:id', () => {
       .post('/api/v1/producer')
       .send({
         name: 'Producer Name',
-        cpfCnpj: '39295046005',
+        cpfCnpj: '93738937005',
       })
       .expect(201);
 
-    const input = {
-      name: 'Updated Producer Name',
-    };
-
     const result = await request(app.getHttpServer())
-      .patch(`/api/v1/producer/${(response.body as { id: string }).id}`)
-      .send(input)
+      .get(`/api/v1/producer/${(response.body as { id: string }).id}`)
       .expect(200);
+
     expect(result.status).toBe(200);
-    expect((result.body as { name: string }).name).toBe(input.name);
+    expect((result.body as { id: string }).id).toBe(
+      (response.body as { id: string }).id,
+    );
   });
 
-  it('With empty name', async () => {
-    const response = await request(app.getHttpServer())
-      .post('/api/v1/producer')
-      .send({
-        name: 'Producer Name',
-        cpfCnpj: '73357965046',
-      })
-      .expect(201);
-    const input = {
-      name: '',
-    };
-
+  it('With unexisting id', async () => {
     const result = await request(app.getHttpServer())
-      .patch(`/api/v1/producer/${(response.body as { id: string }).id}`)
-      .send(input)
-      .expect(400);
+      .get(`/api/v1/producer/non-existing-id`)
+      .expect(404);
 
-    expect(result.status).toBe(400);
-    expect(
-      (result.body as { message: string[] }).message.some((msg: string) =>
-        msg.includes('Name must be between 3 and 100 characters long'),
-      ),
-    ).toBe(true);
+    expect(result.status).toBe(404);
+    expect((result.body as { message: string }).message).toBe(
+      'Producer not found',
+    );
   });
 });

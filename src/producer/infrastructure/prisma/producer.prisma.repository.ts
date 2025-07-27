@@ -75,4 +75,16 @@ export class ProducerPrismaRepository implements ProducerRepository {
   async delete(id: string): Promise<void> {
     await this.prismaService.producer.delete({ where: { id } });
   }
+
+  async list(): Promise<Producer[]> {
+    const data = await this.prismaService.producer.findMany();
+
+    return data.map((item) => {
+      return new Producer({
+        id: item.id,
+        name: Name.create(item.name) as Name,
+        cpfCnpj: CpfCnpj.create(item.cpfCnpj) as CpfCnpj,
+      });
+    });
+  }
 }

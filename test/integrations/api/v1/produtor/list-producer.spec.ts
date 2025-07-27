@@ -5,7 +5,7 @@ import * as request from 'supertest';
 import { App } from 'supertest/types';
 import { AppModule } from '../../../../../src/app.module';
 
-describe('DELETE api/v1/produtor/:id', () => {
+describe('GET api/v1/produtor', () => {
   let app: INestApplication<App>;
 
   beforeEach(async () => {
@@ -23,34 +23,20 @@ describe('DELETE api/v1/produtor/:id', () => {
   });
 
   it('With valid data', async () => {
-    const response = await request(app.getHttpServer())
+    await request(app.getHttpServer())
       .post('/api/v1/producer')
       .send({
         name: 'Producer Name',
-        cpfCnpj: '63987240000141',
+        cpfCnpj: '47272972050',
       })
       .expect(201);
 
     const result = await request(app.getHttpServer())
-      .delete(`/api/v1/producer/${(response.body as { id: string }).id}`)
+      .get(`/api/v1/producer`)
       .expect(200);
+
     expect(result.status).toBe(200);
-    expect((result.body as { message: string }).message).toBe(
-      'Producer deleted successfully',
-    );
-    expect((result.body as { producerId: string }).producerId).toBe(
-      (response.body as { id: string }).id,
-    );
-  });
-
-  it('With unexisting id', async () => {
-    const result = await request(app.getHttpServer())
-      .delete(`/api/v1/producer/non-existing-id`)
-      .expect(404);
-
-    expect(result.status).toBe(404);
-    expect((result.body as { message: string }).message).toBe(
-      'Producer not found',
-    );
+    expect(Array.isArray(result.body)).toBe(true);
+    expect((result.body as Array<{ id: string }>).length).toBeGreaterThan(0);
   });
 });
