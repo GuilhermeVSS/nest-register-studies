@@ -18,6 +18,7 @@ export const setupTestDatabase = async (): Promise<void> => {
   process.env.DATABASE_URL = url;
 
   execSync('yarn prisma migrate deploy', { stdio: 'inherit' });
+  execSync('yarn prisma db seed', { stdio: 'inherit' });
 };
 
 export const teardownTestDatabase = async (): Promise<void> => {
