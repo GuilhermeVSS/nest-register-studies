@@ -273,4 +273,46 @@ describe('FarmController', () => {
       ).rejects.toThrow(NotFoundException);
     });
   });
+
+  describe('findById', () => {
+    it('should find a farm by id successfully', async () => {
+      (farmRepository.findById as jest.Mock).mockResolvedValue(
+        new Farm({
+          id: 'fb9cc64f-a088-4c93-be42-2ec0d826050d',
+          name: 'Farm Test',
+          city: 'City Test',
+          stateId: '7457f7e9-8794-4a71-838c-eb688ebc887b',
+          producerId: '80ec73f4-47fe-441b-a5ec-b37779a6fc4a',
+          farmArea: FarmArea.create({
+            totalArea: 5.5,
+            vegetationArea: 3.5,
+            arableArea: 2.0,
+          }) as FarmArea,
+        }),
+      );
+
+      const result = await controller.findById(
+        'fb9cc64f-a088-4c93-be42-2ec0d826050d',
+      );
+
+      expect(result).toEqual({
+        id: 'fb9cc64f-a088-4c93-be42-2ec0d826050d',
+        name: 'Farm Test',
+        city: 'City Test',
+        stateId: '7457f7e9-8794-4a71-838c-eb688ebc887b',
+        producerId: '80ec73f4-47fe-441b-a5ec-b37779a6fc4a',
+        totalArea: 5.5,
+        vegetationArea: 3.5,
+        arableArea: 2.0,
+      });
+    });
+
+    it('should return NotFoundException', async () => {
+      (farmRepository.findById as jest.Mock).mockResolvedValue(null);
+
+      await expect(
+        controller.delete('fb9cc64f-a088-4c93-be42-2ec0d826050d'),
+      ).rejects.toThrow(NotFoundException);
+    });
+  });
 });

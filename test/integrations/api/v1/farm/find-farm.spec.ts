@@ -17,7 +17,7 @@ interface Farm {
   id: string;
 }
 
-describe('DELETE api/v1/farm/:id', () => {
+describe('GET api/v1/farm/:id', () => {
   let app: INestApplication<App>;
 
   beforeEach(async () => {
@@ -43,7 +43,7 @@ describe('DELETE api/v1/farm/:id', () => {
       .post('/api/v1/producer')
       .send({
         name: 'Producer Name',
-        cpfCnpj: '91928625000173',
+        cpfCnpj: '77984892075',
       })
       .expect(201)) as { body: Producer };
 
@@ -62,15 +62,15 @@ describe('DELETE api/v1/farm/:id', () => {
       .expect(201)) as { body: Farm };
 
     const response = await request(app.getHttpServer())
-      .delete(`/api/v1/farm/${farm.id}`)
+      .get(`/api/v1/farm/${farm.id}`)
       .expect(200);
     expect(response.status).toBe(200);
-    expect((response.body as { farmId: string }).farmId).toBe(farm.id);
+    expect((response.body as { id: string }).id).toBe(farm.id);
   });
 
   it('With unexisting farm', async () => {
     const response = await request(app.getHttpServer())
-      .delete(`/api/v1/farm/69b0e571-90b8-4bb7-ad33-0c45fa7c2692`)
+      .get(`/api/v1/farm/69b0e571-90b8-4bb7-ad33-0c45fa7c2692`)
       .expect(404);
     expect(response.status).toBe(404);
     expect((response.body as { message: string }).message).toBe(

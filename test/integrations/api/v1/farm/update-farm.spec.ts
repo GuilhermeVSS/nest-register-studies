@@ -17,7 +17,7 @@ interface Farm {
   id: string;
 }
 
-describe('PATCH api/v1/farm', () => {
+describe('PATCH api/v1/farm/:id', () => {
   let app: INestApplication<App>;
 
   beforeEach(async () => {
