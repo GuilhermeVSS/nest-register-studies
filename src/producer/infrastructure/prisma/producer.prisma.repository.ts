@@ -71,4 +71,8 @@ export class ProducerPrismaRepository implements ProducerRepository {
       cpfCnpj: CpfCnpj.create(data.cpfCnpj) as CpfCnpj,
     });
   }
+
+  async delete(id: string): Promise<void> {
+    await this.prismaService.producer.delete({ where: { id } });
+  }
 }

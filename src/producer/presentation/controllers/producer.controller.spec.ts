@@ -1,5 +1,9 @@
 import { ProducerController } from './producer.controller';
-import { BadRequestException, ConflictException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import { ProducerPrismaRepository } from '../../infrastructure/prisma/producer.prisma.repository';
 import { PrismaService } from 'prisma/prisma.service';
 
@@ -13,6 +17,7 @@ describe('ProducerController', () => {
       findByCpfCnpj = jest.fn();
       findById = jest.fn();
       update = jest.fn();
+      delete = jest.fn();
     }
     producerRepository = new MockProducerPrismaRepository({} as PrismaService);
     controller = new ProducerController(producerRepository);
@@ -119,6 +124,34 @@ describe('ProducerController', () => {
           name: '',
         }),
       ).rejects.toThrow(BadRequestException);
+    });
+  });
+
+  describe('delete', () => {
+    it('should delete a producer successfully', async () => {
+      const producerId = '1a8f1fcd-8461-4195-9a11-47be00d8dd43';
+      (producerRepository.findById as jest.Mock).mockResolvedValue({
+        id: producerId,
+        name: { value: 'Producer Name' },
+        cpfCnpj: { value: '60899174000' },
+      });
+      (producerRepository.delete as jest.Mock).mockResolvedValue(undefined);
+
+      const result = await controller.delete(producerId);
+
+      expect(result).toEqual({
+        message: 'Producer deleted successfully',
+        producerId,
+      });
+    });
+
+    it('should throw NotFoundException if producer does not exist', async () => {
+      const producerId = '1a8f1fcd-8461-4195-9a11-47be00d8dd43';
+      (producerRepository.findById as jest.Mock).mockResolvedValue(null);
+
+      await expect(controller.delete(producerId)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 });
