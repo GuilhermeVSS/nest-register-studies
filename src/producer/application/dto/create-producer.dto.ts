@@ -12,7 +12,7 @@ export class CreateProducerDto {
 
   @IsString()
   @ApiProperty({
-    description: 'CPF or CNPJ of the producer, must contain only digits',
+    description: 'CPF/CNPJ of the producer, must contain only digits',
     example: '22349605094',
   })
   @Matches(/^\d{11}|\d{14}$/, {

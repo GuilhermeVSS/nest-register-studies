@@ -22,6 +22,11 @@ export class ProducerController {
     description: 'The record has been successfully created.',
   })
   @ApiResponse({ status: 400, description: 'Bad Request.' })
+  @ApiResponse({ status: 500, description: 'Internal Server Error.' })
+  @ApiResponse({
+    status: 409,
+    description: 'Conflict: Producer already exists.',
+  })
   async create(@Body() dto: CreateProducerDto) {
     const producer = await this.createProducerUseCase.execute(dto);
     return producer;

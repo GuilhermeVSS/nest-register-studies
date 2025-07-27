@@ -1,4 +1,4 @@
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, ConflictException } from '@nestjs/common';
 import { CreateProducerUseCase } from './create-producer.use-case';
 import { ProducerRepository } from '../../domain/repositories/producer.repository';
 import { Producer } from '../../domain/entities/producer.entity';
@@ -62,6 +62,6 @@ describe('CreateProducerUseCase', () => {
       .spyOn(producerRepository, 'findByCpfCnpj')
       .mockResolvedValue(mockProducer);
 
-    await expect(useCase.execute(input)).rejects.toThrow(BadRequestException);
+    await expect(useCase.execute(input)).rejects.toThrow(ConflictException);
   });
 });

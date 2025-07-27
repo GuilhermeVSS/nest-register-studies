@@ -2,7 +2,7 @@ import { ProducerRepository } from '../../domain/repositories/producer.repositor
 import { Producer } from '../../domain/entities/producer.entity';
 import { CpfCnpj } from '../../domain/value-objects/cpf-cnpj.vo';
 import { Name } from '../../domain/value-objects/name.vo';
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, ConflictException } from '@nestjs/common';
 
 interface CreateProducerInput {
   name: string;
@@ -37,9 +37,7 @@ export class CreateProducerUseCase {
     );
 
     if (existingProducer) {
-      throw new BadRequestException(
-        'Producer with this CPF/CNPJ already exists',
-      );
+      throw new ConflictException('Producer with this CPF/CNPJ already exists');
     }
 
     const producer = new Producer({

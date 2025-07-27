@@ -1,5 +1,5 @@
 import { ProducerController } from './producer.controller';
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, ConflictException } from '@nestjs/common';
 import { ProducerPrismaRepository } from '../../infrastructure/prisma/producer.prisma.repository';
 import { PrismaService } from 'prisma/prisma.service';
 
@@ -54,7 +54,7 @@ describe('ProducerController', () => {
     ).rejects.toThrow(BadRequestException);
   });
 
-  it('should return BadRequestException due to existing producer', async () => {
+  it('should return ConflictException due to existing producer', async () => {
     (producerRepository.findByCpfCnpj as jest.Mock).mockResolvedValue({
       id: 'existing-id',
       name: { value: 'Producer Name' },
@@ -66,6 +66,6 @@ describe('ProducerController', () => {
         name: 'Producer Name',
         cpfCnpj: '31101816066',
       }),
-    ).rejects.toThrow(BadRequestException);
+    ).rejects.toThrow(ConflictException);
   });
 });
