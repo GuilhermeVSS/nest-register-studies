@@ -1,0 +1,35 @@
+name: Automated Tests
+
+on: pull_request
+
+jobs:
+  jest-unit:
+    name: Jest Unit Tests Ubuntu
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - run: yarn install --frozen-lockfile
+
+      - run: yarn run test
+  jest-integration:
+    name: Jest Integration Tests Ubuntu
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - run: yarn install --frozen-lockfile
+
+      - run: yarn run test:e2e
