@@ -18,6 +18,7 @@ import { UpdateCropDto } from '../../application/dto/update-crop.dto';
 import { UpdateCropUseCase } from '../../application/use-cases/update-crop.use-case';
 import { DeleteCropUseCase } from '../../application/use-cases/delete-crop.use-case';
 import { FindCropUseCase } from '../../application/use-cases/find-crop.use-case';
+import { ListCropUseCase } from '../../application/use-cases/list-crop.use-case';
 @ApiTags('Crops')
 @Controller('api/v1/crop')
 export class CropController {
@@ -25,11 +26,14 @@ export class CropController {
   private readonly updateCropUseCase: UpdateCropUseCase;
   private readonly deleteCropUseCase: DeleteCropUseCase;
   private readonly findCropUseCase: FindCropUseCase;
+  private readonly listCropUseCase: ListCropUseCase;
+
   constructor(private readonly cropRepository: CropPrismaRepository) {
     this.createCropUseCase = new CreateCropUseCase(this.cropRepository);
     this.updateCropUseCase = new UpdateCropUseCase(this.cropRepository);
     this.deleteCropUseCase = new DeleteCropUseCase(this.cropRepository);
     this.findCropUseCase = new FindCropUseCase(this.cropRepository);
+    this.listCropUseCase = new ListCropUseCase(this.cropRepository);
   }
 
   @Post()
@@ -89,5 +93,17 @@ export class CropController {
   @ApiResponse({ status: 500, description: 'Internal Server Error.' })
   async findById(@Param('id') id: IdCropDto['id']) {
     return await this.findCropUseCase.execute(id);
+  }
+
+  @Get()
+  @HttpCode(HttpStatus.OK)
+  @ApiResponse({
+    status: 200,
+    description: 'The record has been found',
+  })
+  @ApiResponse({ status: 400, description: 'Bad Request.' })
+  @ApiResponse({ status: 500, description: 'Internal Server Error.' })
+  async findAll() {
+    return await this.listCropUseCase.execute();
   }
 }

@@ -18,7 +18,7 @@ describe('FindCropUseCase', () => {
     useCase = new FindCropUseCase(cropRepository);
   });
 
-  it('shoul delete a crop successfully', async () => {
+  it('shoul find a crop successfully', async () => {
     const mockCrop = new Crop({
       id: '7457f7e9-8794-4a71-838c-eb688ebc887b',
       name: 'Crop test',
