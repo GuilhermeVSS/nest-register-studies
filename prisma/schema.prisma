@@ -39,10 +39,29 @@ model Farm {
   stateId        String
   state          State    @relation(fields: [stateId], references: [id])
 
+  harvests       Harvest[]
+
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
   @@index([producerId])
   @@index([stateId])
   @@unique([producerId, name])
+}
+
+model Harvest {
+  id        String   @id @default(uuid())
+  name      String   // ex: "Safra 2021", "Safra 2022"
+  year      Int
+
+  farmId    String
+  farm      Farm     @relation(fields: [farmId], references: [id], onDelete: Cascade)
+
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([farmId])
+  @@index([year])
+  @@unique([farmId, year])
 }

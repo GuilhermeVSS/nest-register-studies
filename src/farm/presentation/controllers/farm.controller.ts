@@ -14,7 +14,7 @@ import { CreateFarmUseCase } from '../../application/use-cases/create-farm.use-c
 import { FarmPrismaRepository } from '../../infrastructure/prisma/farm.prisma.repository';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UpdateFarmUseCase } from '../../application/use-cases/update-farm.use-case';
-import { IdFarmDto } from '../..//application/dto/id-farm.dto';
+import { IdFarmDto } from '../../application/dto/id-farm.dto';
 import { UpdateFarmDto } from '../../application/dto/update-form.dto';
 import { DeleteFarmUseCase } from '../../application/use-cases/delete-farm.use-case';
 import { FindFarmUseCase } from '../../application/use-cases/find-farm.use-case';
