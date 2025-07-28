@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   HttpCode,
   HttpStatus,
   Param,
@@ -16,16 +17,19 @@ import { IdCropDto } from '../../application/dto/id-crop.dto';
 import { UpdateCropDto } from '../../application/dto/update-crop.dto';
 import { UpdateCropUseCase } from '../../application/use-cases/update-crop.use-case';
 import { DeleteCropUseCase } from '../../application/use-cases/delete-crop.use-case';
+import { FindCropUseCase } from '../../application/use-cases/find-crop.use-case';
 @ApiTags('Crops')
 @Controller('api/v1/crop')
 export class CropController {
   private readonly createCropUseCase: CreateCropUseCase;
   private readonly updateCropUseCase: UpdateCropUseCase;
   private readonly deleteCropUseCase: DeleteCropUseCase;
+  private readonly findCropUseCase: FindCropUseCase;
   constructor(private readonly cropRepository: CropPrismaRepository) {
     this.createCropUseCase = new CreateCropUseCase(this.cropRepository);
     this.updateCropUseCase = new UpdateCropUseCase(this.cropRepository);
     this.deleteCropUseCase = new DeleteCropUseCase(this.cropRepository);
+    this.findCropUseCase = new FindCropUseCase(this.cropRepository);
   }
 
   @Post()
@@ -64,13 +68,26 @@ export class CropController {
   @Delete(':id')
   @HttpCode(HttpStatus.OK)
   @ApiResponse({
-    status: 201,
-    description: 'The record has been successfully created',
+    status: 200,
+    description: 'The record has been successfully deleted',
   })
   @ApiResponse({ status: 400, description: 'Bad Request.' })
   @ApiResponse({ status: 404, description: 'Crop not found' })
   @ApiResponse({ status: 500, description: 'Internal Server Error.' })
   async delete(@Param('id') id: IdCropDto['id']) {
     return await this.deleteCropUseCase.execute(id);
+  }
+
+  @Get(':id')
+  @HttpCode(HttpStatus.OK)
+  @ApiResponse({
+    status: 200,
+    description: 'The record has been found',
+  })
+  @ApiResponse({ status: 400, description: 'Bad Request.' })
+  @ApiResponse({ status: 404, description: 'Crop not found' })
+  @ApiResponse({ status: 500, description: 'Internal Server Error.' })
+  async findById(@Param('id') id: IdCropDto['id']) {
+    return await this.findCropUseCase.execute(id);
   }
 }
