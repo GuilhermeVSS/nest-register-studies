@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { HarvestPrismaRepository } from '../../infrastructure/prisma/harvest.prisma.repository';
-import { PrismaService } from 'prisma/prisma.service';
+import { PrismaService } from '../../../../prisma/prisma.service';
 import { Prisma } from '@prisma/client';
 import { Harvest } from '../../domain/entities/harvest.entity';
 
