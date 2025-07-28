@@ -7,6 +7,7 @@ import { HarvestModule } from './harvest/harvest.module';
 import { FarmModule } from './farm/farm.module';
 import { StateModule } from './state/state.module';
 import { CropModule } from './crop/crop.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 import { ConfigModule } from '@nestjs/config';
 
 @Module({
@@ -17,6 +18,7 @@ import { ConfigModule } from '@nestjs/config';
     FarmModule,
     CropModule,
     HarvestModule,
+    DashboardModule,
     ConfigModule.forRoot(),
   ],
   controllers: [AppController],
