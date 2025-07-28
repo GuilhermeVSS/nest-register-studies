@@ -57,6 +57,7 @@ model Harvest {
   farmId    String
   farm      Farm     @relation(fields: [farmId], references: [id], onDelete: Cascade)
 
+  crops     Crop[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -64,4 +65,20 @@ model Harvest {
   @@index([farmId])
   @@index([year])
   @@unique([farmId, year])
+}
+
+
+model Crop {
+  id        String   @id @default(uuid())
+  name      String   // ex: "Soja", "Milho", "Café"
+
+  harvestId String
+  harvest   Harvest  @relation(fields: [harvestId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([harvestId])
+  @@index([name])
+  @@unique([harvestId, name])
 }
