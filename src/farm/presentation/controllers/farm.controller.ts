@@ -18,6 +18,7 @@ import { IdFarmDto } from '../../application/dto/id-farm.dto';
 import { UpdateFarmDto } from '../../application/dto/update-form.dto';
 import { DeleteFarmUseCase } from '../../application/use-cases/delete-farm.use-case';
 import { FindFarmUseCase } from '../../application/use-cases/find-farm.use-case';
+import { ListFarmUseCase } from '../../application/use-cases/list-farm.use-case';
 
 @ApiTags('Farms')
 @Controller('api/v1/farm')
@@ -26,12 +27,14 @@ export class FarmController {
   private readonly updateFarmUseCase: UpdateFarmUseCase;
   private readonly deleteFarmUseCase: DeleteFarmUseCase;
   private readonly findFarmUseCase: FindFarmUseCase;
+  private readonly listFarmUseCase: ListFarmUseCase;
 
   constructor(private readonly farmRepository: FarmPrismaRepository) {
     this.createFarmUseCase = new CreateFarmUseCase(this.farmRepository);
     this.updateFarmUseCase = new UpdateFarmUseCase(this.farmRepository);
     this.deleteFarmUseCase = new DeleteFarmUseCase(this.farmRepository);
     this.findFarmUseCase = new FindFarmUseCase(this.farmRepository);
+    this.listFarmUseCase = new ListFarmUseCase(this.farmRepository);
   }
 
   @Post()
@@ -98,5 +101,16 @@ export class FarmController {
   })
   async findById(@Param('id') id: IdFarmDto['id']) {
     return await this.findFarmUseCase.execute(id);
+  }
+
+  @Get()
+  @HttpCode(HttpStatus.OK)
+  @ApiResponse({
+    status: 200,
+    description: 'Farms found successfully.',
+  })
+  @ApiResponse({ status: 500, description: 'Internal Server Error.' })
+  async findAll() {
+    return await this.listFarmUseCase.execute();
   }
 }
