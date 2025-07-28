@@ -44,6 +44,27 @@ $ yarn run start:dev
 $ yarn run start:prod
 ```
 
+## Database Development
+
+```bash
+# build postgres container
+$ yarn run services:up
+
+```
+
+## Running Migrations and Seeds
+
+```bash
+# generate client
+$ yarn run prisma:generate
+
+# run pending migrations
+$ yarn run prisma:migrate
+
+# run seeds
+$ yarn run prisma:seed
+```
+
 ## Run tests
 
 ```bash
