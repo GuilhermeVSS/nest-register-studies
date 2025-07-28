@@ -26,7 +26,7 @@ describe('CreateCropUseCase', () => {
 
     const mockCrop = new Crop({
       id: '7457f7e9-8794-4a71-838c-eb688ebc887b',
-      name: 'Crop Test',
+      name: 'Crop name',
       harvestId: '80ec73f4-47fe-441b-a5ec-b37779a6fc4a',
     });
 
@@ -36,8 +36,8 @@ describe('CreateCropUseCase', () => {
 
     expect(result).toEqual({
       id: mockCrop.id,
-      name: mockCrop.name,
-      harvestId: mockCrop.harvestId,
+      name: input.name,
+      harvestId: input.harvestId,
     });
   });
 

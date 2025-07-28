@@ -83,4 +83,65 @@ describe('CropController', () => {
       ).rejects.toThrow(ConflictException);
     });
   });
+
+  describe('update', () => {
+    it('should update a harvest successfully', async () => {
+      const input = {
+        name: 'Crop Test',
+      };
+
+      (cropRepository.findById as jest.Mock).mockResolvedValue(
+        new Crop({
+          id: 'fb9cc64f-a088-4c93-be42-2ec0d826050d',
+          name: 'Crop Old Name',
+          harvestId: '80ec73f4-47fe-441b-a5ec-b37779a6fc4a',
+        }),
+      );
+
+      (cropRepository.update as jest.Mock).mockResolvedValue(
+        new Crop({
+          id: 'fb9cc64f-a088-4c93-be42-2ec0d826050d',
+          name: input.name,
+          harvestId: '80ec73f4-47fe-441b-a5ec-b37779a6fc4a',
+        }),
+      );
+
+      const result = await controller.update(
+        'fb9cc64f-a088-4c93-be42-2ec0d826050d',
+        input,
+      );
+
+      expect(result).toEqual({
+        id: 'fb9cc64f-a088-4c93-be42-2ec0d826050d',
+        name: input.name,
+        harvestId: '80ec73f4-47fe-441b-a5ec-b37779a6fc4a',
+      });
+    });
+
+    it('should return ConflictException due to existing harvest to the same farm', async () => {
+      (cropRepository.findById as jest.Mock).mockResolvedValue(
+        new Crop({
+          id: 'fb9cc64f-a088-4c93-be42-2ec0d826050d',
+          name: 'Crop Old Name',
+          harvestId: '80ec73f4-47fe-441b-a5ec-b37779a6fc4a',
+        }),
+      );
+
+      (cropRepository.update as jest.Mock).mockRejectedValue({
+        code: 'P2002',
+        clientVersion: Prisma.prismaVersion.client,
+        meta: {
+          target: ['harvestId', 'name'],
+        },
+        name: 'PrismaClientKnownRequestError',
+        message: 'Unique constraint failed on the fields: (`harvestId`,`name`)',
+      });
+
+      await expect(
+        controller.update('fb9cc64f-a088-4c93-be42-2ec0d826050d', {
+          name: 'Crop Test',
+        }),
+      ).rejects.toThrow(ConflictException);
+    });
+  });
 });
