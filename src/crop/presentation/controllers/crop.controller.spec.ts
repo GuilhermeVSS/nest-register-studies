@@ -1,5 +1,9 @@
 import { CropController } from './crop.controller';
-import { BadRequestException, ConflictException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import { CropPrismaRepository } from '../../infrastructure/prisma/crop.prisma.repository';
 import { PrismaService } from '../../../../prisma/prisma.service';
 import { Prisma } from '@prisma/client';
@@ -22,7 +26,7 @@ describe('CropController', () => {
   });
 
   describe('create', () => {
-    it('should create a harvest successfully', async () => {
+    it('should create a crop successfully', async () => {
       const input = {
         name: 'Crop Test',
         harvestId: '80ec73f4-47fe-441b-a5ec-b37779a6fc4a',
@@ -64,7 +68,7 @@ describe('CropController', () => {
       ).rejects.toThrow(BadRequestException);
     });
 
-    it('should return ConflictException due to existing harvest to the same farm', async () => {
+    it('should return ConflictException due to existing crop to the same harvest', async () => {
       (cropRepository.save as jest.Mock).mockRejectedValue({
         code: 'P2002',
         clientVersion: Prisma.prismaVersion.client,
@@ -85,7 +89,7 @@ describe('CropController', () => {
   });
 
   describe('update', () => {
-    it('should update a harvest successfully', async () => {
+    it('should update a crop successfully', async () => {
       const input = {
         name: 'Crop Test',
       };
@@ -118,7 +122,7 @@ describe('CropController', () => {
       });
     });
 
-    it('should return ConflictException due to existing harvest to the same farm', async () => {
+    it('should return ConflictException due to existing crop to the same harvest', async () => {
       (cropRepository.findById as jest.Mock).mockResolvedValue(
         new Crop({
           id: 'fb9cc64f-a088-4c93-be42-2ec0d826050d',
@@ -142,6 +146,35 @@ describe('CropController', () => {
           name: 'Crop Test',
         }),
       ).rejects.toThrow(ConflictException);
+    });
+  });
+
+  describe('delete', () => {
+    it('should delete a crop successfully', async () => {
+      (cropRepository.findById as jest.Mock).mockResolvedValue(
+        new Crop({
+          id: 'fb9cc64f-a088-4c93-be42-2ec0d826050d',
+          name: 'Crop Old Name',
+          harvestId: '80ec73f4-47fe-441b-a5ec-b37779a6fc4a',
+        }),
+      );
+
+      const result = await controller.delete(
+        'fb9cc64f-a088-4c93-be42-2ec0d826050d',
+      );
+
+      expect(result).toEqual({
+        cropId: 'fb9cc64f-a088-4c93-be42-2ec0d826050d',
+        message: 'Crop has been deleted successfully.',
+      });
+    });
+
+    it('should throw NotFoundException a crop successfully', async () => {
+      (cropRepository.findById as jest.Mock).mockResolvedValue(null);
+
+      await expect(
+        controller.delete('fb9cc64f-a088-4c93-be42-2ec0d826050d'),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 });
