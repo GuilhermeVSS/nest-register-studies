@@ -9,9 +9,12 @@ import { StateModule } from './state/state.module';
 import { CropModule } from './crop/crop.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { ConfigModule } from '@nestjs/config';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
+    ThrottlerModule.forRoot([{ limit: 10, ttl: 60000 }]),
     PrismaModule,
     ProducerModule,
     StateModule,
@@ -22,6 +25,12 @@ import { ConfigModule } from '@nestjs/config';
     ConfigModule.forRoot(),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+  ],
 })
 export class AppModule {}
