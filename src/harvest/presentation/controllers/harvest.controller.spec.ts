@@ -89,4 +89,69 @@ describe('HarvestController', () => {
       ).rejects.toThrow(ConflictException);
     });
   });
+
+  describe('update', () => {
+    it('should update a harvest successfully', async () => {
+      const input = {
+        name: 'Harvest Test',
+        year: 2025,
+      };
+
+      (harvestRepository.findById as jest.Mock).mockResolvedValue(
+        new Harvest({
+          id: 'fb9cc64f-a088-4c93-be42-2ec0d826050d',
+          name: 'Old name',
+          year: 2024,
+          farmId: '80ec73f4-47fe-441b-a5ec-b37779a6fc4a',
+        }),
+      );
+      (harvestRepository.update as jest.Mock).mockResolvedValue(
+        new Harvest({
+          id: 'fb9cc64f-a088-4c93-be42-2ec0d826050d',
+          name: input.name,
+          year: input.year,
+          farmId: '80ec73f4-47fe-441b-a5ec-b37779a6fc4a',
+        }),
+      );
+
+      const result = await controller.update(
+        '80ec73f4-47fe-441b-a5ec-b37779a6fc4a',
+        input,
+      );
+
+      expect(result).toEqual({
+        id: 'fb9cc64f-a088-4c93-be42-2ec0d826050d',
+        name: input.name,
+        year: input.year,
+        farmId: '80ec73f4-47fe-441b-a5ec-b37779a6fc4a',
+      });
+    });
+
+    it('should return ConflictException due to existing harvest to the same farm', async () => {
+      (harvestRepository.findById as jest.Mock).mockResolvedValue(
+        new Harvest({
+          id: 'fb9cc64f-a088-4c93-be42-2ec0d826050d',
+          name: 'Old name',
+          year: 2024,
+          farmId: '80ec73f4-47fe-441b-a5ec-b37779a6fc4a',
+        }),
+      );
+      (harvestRepository.update as jest.Mock).mockRejectedValue({
+        code: 'P2002',
+        clientVersion: Prisma.prismaVersion.client,
+        meta: {
+          target: ['farmId', 'year'],
+        },
+        name: 'PrismaClientKnownRequestError',
+        message: 'Unique constraint failed on the fields: (`farmId`,`year`)',
+      });
+
+      await expect(
+        controller.update('fb9cc64f-a088-4c93-be42-2ec0d826050d', {
+          name: 'Harvest Test',
+          year: 2025,
+        }),
+      ).rejects.toThrow(ConflictException);
+    });
+  });
 });
