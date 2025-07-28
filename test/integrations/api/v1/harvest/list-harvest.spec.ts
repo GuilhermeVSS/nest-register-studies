@@ -21,7 +21,7 @@ interface Harvest {
   id: string;
 }
 
-describe('GET api/v1/harvest/:id', () => {
+describe('GET api/v1/harvest', () => {
   let app: INestApplication<App>;
 
   beforeEach(async () => {
@@ -47,14 +47,14 @@ describe('GET api/v1/harvest/:id', () => {
       .post('/api/v1/producer')
       .send({
         name: 'Producer List Name',
-        cpfCnpj: '87569760000100',
+        cpfCnpj: '79746970089',
       })
       .expect(201)) as { body: Producer };
 
     const { body: farm } = (await request(app.getHttpServer())
       .post('/api/v1/farm')
       .send({
-        name: 'Find Test Farm ',
+        name: 'List Test Farm ',
         city: 'City Test',
         stateId: (states[0] as { id: string }).id,
         producerId: (producer as { id: string }).id,
@@ -64,29 +64,19 @@ describe('GET api/v1/harvest/:id', () => {
       })
       .expect(201)) as { body: Farm };
 
-    const { body: harvest } = (await request(app.getHttpServer())
+    (await request(app.getHttpServer())
       .post('/api/v1/harvest')
       .send({
-        name: 'Harvest Find Name',
+        name: 'Harvest List Name',
         year: 2025,
         farmId: farm.id,
       })
       .expect(201)) as { body: Harvest };
 
     const response = await request(app.getHttpServer())
-      .get(`/api/v1/harvest/${harvest.id}`)
+      .get(`/api/v1/harvest/`)
       .expect(200);
 
-    expect(response.body).toEqual(harvest);
-  });
-
-  it('With invalid harvestId', async () => {
-    const response = await request(app.getHttpServer())
-      .get(`/api/v1/harvest/58e4bd58-99f4-45c0-903c-aeaee9833ac9`)
-      .expect(404);
-
-    expect((response.body as { message: string }).message).toBe(
-      'Harvest not found',
-    );
+    expect(Array.isArray(response.body)).toBe(true);
   });
 });

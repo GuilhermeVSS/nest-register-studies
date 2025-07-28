@@ -220,4 +220,28 @@ describe('HarvestController', () => {
       ).rejects.toThrow(NotFoundException);
     });
   });
+
+  describe('findById', () => {
+    it('should list harvest successfully', async () => {
+      (harvestRepository.list as jest.Mock).mockResolvedValue([
+        new Harvest({
+          id: 'fb9cc64f-a088-4c93-be42-2ec0d826050d',
+          name: 'Old name',
+          year: 2024,
+          farmId: '80ec73f4-47fe-441b-a5ec-b37779a6fc4a',
+        }),
+      ]);
+
+      const result = await controller.findAll();
+
+      expect(result).toEqual([
+        {
+          id: 'fb9cc64f-a088-4c93-be42-2ec0d826050d',
+          name: 'Old name',
+          year: 2024,
+          farmId: '80ec73f4-47fe-441b-a5ec-b37779a6fc4a',
+        },
+      ]);
+    });
+  });
 });
