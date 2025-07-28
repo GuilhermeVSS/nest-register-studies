@@ -6,6 +6,7 @@ import {
   HttpStatus,
   Patch,
   Param,
+  Delete,
 } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateHarvestDto } from '../../application/dto/create-harvest.dto';
@@ -14,18 +15,22 @@ import { CreateHarvestUseCase } from '../../application/use-cases/create-harvest
 import { HarvestPrismaRepository } from '../../infrastructure/prisma/harvest.prisma.repository';
 import { IdHarvestDto } from '../../application/dto/id-harvest.dto';
 import { UpdateHarvestDto } from '../../application/dto/update-harvest.dto';
-
+import { DeleteHarvestUseCase } from '../../application/use-cases/delete-harvest.use-case';
 @ApiTags('Harvest')
 @Controller('api/v1/harvest')
 export class HarvestController {
   private readonly createHarvestUseCase: CreateHarvestUseCase;
   private readonly updateHarvestUseCase: UpdateHarvestUseCase;
+  private readonly deleteHarvestUseCase: DeleteHarvestUseCase;
 
   constructor(private readonly harvestRepository: HarvestPrismaRepository) {
     this.createHarvestUseCase = new CreateHarvestUseCase(
       this.harvestRepository,
     );
     this.updateHarvestUseCase = new UpdateHarvestUseCase(
+      this.harvestRepository,
+    );
+    this.deleteHarvestUseCase = new DeleteHarvestUseCase(
       this.harvestRepository,
     );
   }
@@ -50,7 +55,7 @@ export class HarvestController {
   @HttpCode(HttpStatus.OK)
   @ApiResponse({
     status: 200,
-    description: 'The record has been successfully created',
+    description: 'The record has been created successfully created',
   })
   @ApiResponse({ status: 400, description: 'Bad Request.' })
   @ApiResponse({ status: 500, description: 'Internal Server Error.' })
@@ -67,5 +72,20 @@ export class HarvestController {
     @Body() dto: UpdateHarvestDto,
   ) {
     return await this.updateHarvestUseCase.execute(id, dto);
+  }
+
+  @Delete(':id')
+  @HttpCode(HttpStatus.OK)
+  @ApiResponse({
+    status: 200,
+    description: 'The record has been successfully deleted',
+  })
+  @ApiResponse({ status: 500, description: 'Internal Server Error.' })
+  @ApiResponse({
+    status: 404,
+    description: 'Farm not found',
+  })
+  async delete(@Param('id') id: IdHarvestDto['id']) {
+    return await this.deleteHarvestUseCase.execute(id);
   }
 }
