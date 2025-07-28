@@ -7,6 +7,7 @@ import {
   Patch,
   Param,
   Delete,
+  Get,
 } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateHarvestDto } from '../../application/dto/create-harvest.dto';
@@ -16,12 +17,14 @@ import { HarvestPrismaRepository } from '../../infrastructure/prisma/harvest.pri
 import { IdHarvestDto } from '../../application/dto/id-harvest.dto';
 import { UpdateHarvestDto } from '../../application/dto/update-harvest.dto';
 import { DeleteHarvestUseCase } from '../../application/use-cases/delete-harvest.use-case';
+import { FindHarvestUseCase } from '../../application/use-cases/find-harvest.use-case';
 @ApiTags('Harvest')
 @Controller('api/v1/harvest')
 export class HarvestController {
   private readonly createHarvestUseCase: CreateHarvestUseCase;
   private readonly updateHarvestUseCase: UpdateHarvestUseCase;
   private readonly deleteHarvestUseCase: DeleteHarvestUseCase;
+  private readonly findHarvestUseCase: FindHarvestUseCase;
 
   constructor(private readonly harvestRepository: HarvestPrismaRepository) {
     this.createHarvestUseCase = new CreateHarvestUseCase(
@@ -33,6 +36,7 @@ export class HarvestController {
     this.deleteHarvestUseCase = new DeleteHarvestUseCase(
       this.harvestRepository,
     );
+    this.findHarvestUseCase = new FindHarvestUseCase(this.harvestRepository);
   }
 
   @Post()
@@ -83,9 +87,24 @@ export class HarvestController {
   @ApiResponse({ status: 500, description: 'Internal Server Error.' })
   @ApiResponse({
     status: 404,
-    description: 'Farm not found',
+    description: 'Harvest not found',
   })
   async delete(@Param('id') id: IdHarvestDto['id']) {
     return await this.deleteHarvestUseCase.execute(id);
+  }
+
+  @Get(':id')
+  @HttpCode(HttpStatus.OK)
+  @ApiResponse({
+    status: 200,
+    description: 'The record has been found',
+  })
+  @ApiResponse({ status: 500, description: 'Internal Server Error.' })
+  @ApiResponse({
+    status: 404,
+    description: 'Hearvest not found',
+  })
+  async findById(@Param('id') id: IdHarvestDto['id']) {
+    return await this.findHarvestUseCase.execute(id);
   }
 }
